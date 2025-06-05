@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookmarker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <main class="interface py-5 position-relative">
+        <div class="container ">
+            <div class="bookmark-card">
+                <h1 class="marker"><i class="fa-solid fa-bookmark text-warning"></i> Bookmarker</h1>
+                <p class="subtitle"><i class="fa-solid fa-bookmark text-warning me-2"></i>Bookmark your favorite sites<i
+                        class="fa-solid fa-bookmark text-warning ms-2"></i></p>
+
+
+                <form id="bookmarkForm">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-book-bookmark"></i>
+                        <label for="siteName" class="form-label text-black fw-semibold">Site Name</label>
+                        <input type="text" id="siteName" class="form-control" placeholder="Enter website name">
+                    </div>
+                    <div class="mb-3">
+                        <i class="fa-solid fa-link "></i>
+                        <label for="siteUrl" class="form-label text-black fw-semibold">Site URL</label>
+                        <input type="text" id="siteUrl" class="form-control" placeholder="https://example.com">
+                    </div>
+                    <button type="submit" id="submitBtn" class="btn btn-primary w-100">Add Bookmark</button>
+                </form>
+                <hr>
+                <table id="bookmarkList" class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Index</th>
+                            <th scope="col">Website</th>
+                            <th scope="col">Visit</th>
+                            <th scope="col">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+       <!-- Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="circles d-flex me-auto">
+          <span class="rounded-circle bg-danger me-2" style="width: 12px; height: 12px;"></span>
+          <span class="rounded-circle bg-warning me-2" style="width: 12px; height: 12px;"></span>
+          <span class="rounded-circle bg-success me-2" style="width: 12px; height: 12px;"></span>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="m-0 pb-2">
+          Site Name or URL is not valid, Please follow the rules below:
+        </p>
+        <ol class="rules list-unstyled m-0" id="errorsList">
+          <!-- Errors will be inserted dynamically here -->
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+      
+
+    </main>
+
+    <script src="js/index.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
