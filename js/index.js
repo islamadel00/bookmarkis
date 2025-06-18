@@ -1,26 +1,36 @@
-//vadliation.js
+//  Validate Email Function
 function validateEmail(email) {
   const re = /\S+@\S+\.\S+/;
   return re.test(email);
 }
 
-// ✅ Register logic
+//  Validate Password Function using regex
+function isPasswordValid(password) {
+  const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+  return regex.test(password);
+}
+
+//  Register Logic
 const regForm = document.getElementById("registerForm");
 if (regForm) {
   regForm.addEventListener("submit", function (e) {
     e.preventDefault();
+
     const name = document.getElementById("username");
     const email = document.getElementById("email");
     const password = document.getElementById("password");
     const error = document.getElementById("regError");
+    const passwordHelp = document.getElementById("passwordHelp");
 
     let valid = true;
 
-    // Reset classes
-    [name, email, password].forEach((input) => {
-      input.classList.remove("is-invalid", "is-valid");
-    });
+    // Reset styles
+    [name, email, password].forEach((input) =>
+      input.classList.remove("is-invalid", "is-valid")
+    );
+    if (passwordHelp) passwordHelp.classList.add("d-none");
 
+    // Name
     if (!name.value.trim()) {
       name.classList.add("is-invalid");
       valid = false;
@@ -28,6 +38,7 @@ if (regForm) {
       name.classList.add("is-valid");
     }
 
+    // Email
     if (!validateEmail(email.value)) {
       email.classList.add("is-invalid");
       valid = false;
@@ -35,8 +46,10 @@ if (regForm) {
       email.classList.add("is-valid");
     }
 
-    if (password.value.length < 6) {
+    // Password with regex
+    if (!isPasswordValid(password.value)) {
       password.classList.add("is-invalid");
+      if (passwordHelp) passwordHelp.classList.remove("d-none");
       valid = false;
     } else {
       password.classList.add("is-valid");
@@ -45,10 +58,10 @@ if (regForm) {
     if (!valid) return;
 
     const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const exists = users.some(u => u.email === email.value.toLowerCase());
+    const exists = users.some((u) => u.email === email.value.toLowerCase());
 
     if (exists) {
-      error.textContent = " This email is already registered.";
+      error.textContent = "This email is already registered.";
       email.classList.add("is-invalid");
       return;
     }
@@ -60,23 +73,24 @@ if (regForm) {
     });
 
     localStorage.setItem("users", JSON.stringify(users));
-    alert("✅ Registered successfully!");
+    alert(" Registered successfully!");
     window.location.href = "index.html";
   });
 }
 
-// ✅ Login logic
+//  Login Logic
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
   loginForm.addEventListener("submit", function (e) {
     e.preventDefault();
+
     const email = document.getElementById("loginEmail");
     const password = document.getElementById("loginPassword");
     const error = document.getElementById("loginError");
 
-    [email, password].forEach((input) => {
-      input.classList.remove("is-invalid", "is-valid");
-    });
+    [email, password].forEach((input) =>
+      input.classList.remove("is-invalid", "is-valid")
+    );
 
     let valid = true;
 
@@ -98,11 +112,13 @@ if (loginForm) {
 
     const users = JSON.parse(localStorage.getItem("users") || "[]");
     const user = users.find(
-      (u) => u.email === email.value.toLowerCase() && u.password === password.value
+      (u) =>
+        u.email === email.value.toLowerCase() &&
+        u.password === password.value
     );
 
     if (!user) {
-      error.textContent = " Incorrect email or password.";
+      error.textContent = "Incorrect email or password.";
       return;
     }
 
@@ -111,7 +127,7 @@ if (loginForm) {
   });
 }
 
-// ✅ Home page name display
+// Display Username on Home Page
 const welcomeUser = document.getElementById("welcomeUser");
 if (welcomeUser) {
   const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -122,7 +138,7 @@ if (welcomeUser) {
   }
 }
 
-// ✅ Logout
+//  Logout Function
 function logout() {
   localStorage.removeItem("currentUser");
   window.location.href = "index.html";
