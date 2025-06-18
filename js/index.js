@@ -1,147 +1,129 @@
-const Bookmark = {
-  bookmarks: [],
-
-  load: function () {
-    const storedBookmarks = localStorage.getItem("bookmarks");
-    if (storedBookmarks) {
-      try {
-        this.bookmarks = JSON.parse(storedBookmarks) || [];
-      } catch (error) {
-        console.error("Error parsing bookmarks from localStorage:", error);
-        localStorage.removeItem("bookmarks");
-        this.bookmarks = [];
-      }
-    }
-  },
-  commit: function () {
-    localStorage.setItem("bookmarks", JSON.stringify(this.bookmarks));
-  },
-  add: function (bookmark) {
-    this.bookmarks.push(bookmark);
-    this.commit();
-  },
-  remove: function (index) {
-    this.bookmarks.splice(index, 1);
-    this.commit();
-  },
-  get: function (index) {
-    return this.bookmarks[index];
-  },
-  getAll: function () {
-    return this.bookmarks;
-  },
-  nextIndex: function () {
-    return this.bookmarks.length - 1;
-  },
-};
-
-function addBookmarkRow(bookmark) {
-  const tr = document.createElement("tr");
-  addTextCell(tr, bookmark.index + 1);
-  addTextCell(tr, bookmark.name);
-  addButtonCell(tr, "Visit", {
-    onclick: function () {
-      window.open(bookmark.url, "_blank");
-    },
-    className: "btn btn-dark",
-  });
-  addButtonCell(tr, "Delete", {
-    onclick: function () {
-      Bookmark.remove(bookmark.index);
-      tr.remove();
-    },
-    className: "btn btn-danger",
-  });
-  return tr;
+//vadliation.js
+function validateEmail(email) {
+  const re = /\S+@\S+\.\S+/;
+  return re.test(email);
 }
 
-function addTextCell(tr, text) {
-  const td = document.createElement("td");
-  td.textContent = text;
-  tr.appendChild(td);
-}
+// ✅ Register logic
+const regForm = document.getElementById("registerForm");
+if (regForm) {
+  regForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const name = document.getElementById("username");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const error = document.getElementById("regError");
 
-function addButtonCell(tr, text, option = {}) {
-  const td = document.createElement("td");
-  const button = document.createElement("button");
-  button.textContent = text;
-  Object.entries(option).forEach(([key, value]) => {
-    button[key] = value;
-  });
-  td.appendChild(button);
-  tr.appendChild(td);
-}
+    let valid = true;
 
-function showErrorAlert(errors) {
-  errorsList = document.getElementById("errorsList");
-  errorsList.innerHTML = "";
-  errors.forEach((error) => {
-    const li = document.createElement("li");
-    li.textContent = error;
-    li.className = "fa-regular fa-circle-right p-2";
-    const icon = document.createElement("i");
-    icon.className = "fa-regular fa-circle-right p-2";
-    li.prepend(icon);
-    errorsList.appendChild(li);
-  });
-  // Show the modal
-  const errorModal = new bootstrap.Modal(document.getElementById("errorModal"));
-  errorModal.show();
-}
-
-function init() {
-  Bookmark.load();
-  const bookmarkList = document.querySelector("#bookmarkList tbody");
-  console.log(bookmarkList);
-
-  const bookmarks = Bookmark.getAll();
-
-  for (let i = 0; i < bookmarks.length; i++) {
-    const bookmark = bookmarks[i];
-    const tr = addBookmarkRow({ ...bookmark, index: i });
-    console.log(tr);
-
-    bookmarkList.appendChild(tr);
-  }
-}
-
-function validateInput(name, url) {
-  const errors = [];
-  if (!name || name.trim() === "") {
-    errors.push("Name cannot be empty.");
-  }
-  if (!url || url.trim() === "") {
-    errors.push("URL cannot be empty.");
-  }
-  if (url && !/^https?:\/\/.+/i.test(url)) {
-    errors.push("URL must start with http:// or https://");
-  }
-  return errors;
-}
-
-// Add event listener for the form submission
-
-document.addEventListener("DOMContentLoaded", function () {
-  console.log("Document loaded, initializing bookmarks...");
-  init();
-  document
-    .getElementById("bookmarkForm")
-    .addEventListener("submit", function (event) {
-      event.preventDefault();
-      const name = document.getElementById("siteName").value;
-      const url = document.getElementById("siteUrl").value;
-      const errors = validateInput(name, url);
-      if (errors.length === 0) {
-        const bookmarkList = document.querySelector("#bookmarkList tbody");
-
-        const bookmark = { name, url };
-        Bookmark.add(bookmark);
-        const tr = addBookmarkRow({ ...bookmark, index: Bookmark.nextIndex() });
-        bookmarkList.appendChild(tr);
-        this.reset();
-      } else {
-        // will do a modal that show the errors here.
-        showErrorAlert(errors);
-      }
+    // Reset classes
+    [name, email, password].forEach((input) => {
+      input.classList.remove("is-invalid", "is-valid");
     });
-});
+
+    if (!name.value.trim()) {
+      name.classList.add("is-invalid");
+      valid = false;
+    } else {
+      name.classList.add("is-valid");
+    }
+
+    if (!validateEmail(email.value)) {
+      email.classList.add("is-invalid");
+      valid = false;
+    } else {
+      email.classList.add("is-valid");
+    }
+
+    if (password.value.length < 6) {
+      password.classList.add("is-invalid");
+      valid = false;
+    } else {
+      password.classList.add("is-valid");
+    }
+
+    if (!valid) return;
+
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const exists = users.some(u => u.email === email.value.toLowerCase());
+
+    if (exists) {
+      error.textContent = " This email is already registered.";
+      email.classList.add("is-invalid");
+      return;
+    }
+
+    users.push({
+      name: name.value.trim(),
+      email: email.value.toLowerCase(),
+      password: password.value,
+    });
+
+    localStorage.setItem("users", JSON.stringify(users));
+    alert("✅ Registered successfully!");
+    window.location.href = "index.html";
+  });
+}
+
+// ✅ Login logic
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+  loginForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const email = document.getElementById("loginEmail");
+    const password = document.getElementById("loginPassword");
+    const error = document.getElementById("loginError");
+
+    [email, password].forEach((input) => {
+      input.classList.remove("is-invalid", "is-valid");
+    });
+
+    let valid = true;
+
+    if (!validateEmail(email.value)) {
+      email.classList.add("is-invalid");
+      valid = false;
+    } else {
+      email.classList.add("is-valid");
+    }
+
+    if (!password.value.trim()) {
+      password.classList.add("is-invalid");
+      valid = false;
+    } else {
+      password.classList.add("is-valid");
+    }
+
+    if (!valid) return;
+
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const user = users.find(
+      (u) => u.email === email.value.toLowerCase() && u.password === password.value
+    );
+
+    if (!user) {
+      error.textContent = " Incorrect email or password.";
+      return;
+    }
+
+    localStorage.setItem("currentUser", JSON.stringify(user));
+    window.location.href = "home.html";
+  });
+}
+
+// ✅ Home page name display
+const welcomeUser = document.getElementById("welcomeUser");
+if (welcomeUser) {
+  const user = JSON.parse(localStorage.getItem("currentUser"));
+  if (!user) {
+    window.location.href = "index.html";
+  } else {
+    welcomeUser.textContent = user.name;
+  }
+}
+
+// ✅ Logout
+function logout() {
+  localStorage.removeItem("currentUser");
+  window.location.href = "index.html";
+}
